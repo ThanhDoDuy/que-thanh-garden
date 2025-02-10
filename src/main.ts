@@ -8,9 +8,9 @@ async function bootstrap() {
 
   // Bật CORS
   app.enableCors({
-    origin: 'http://localhost:3000',  // Cho phép frontend truy cập
+    origin: ['http://localhost:3000', 'https://kick-off-nextjs.vercel.app/'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,  // Nếu có sử dụng cookie hoặc xác thực
+    credentials: true,
   });
 
   const configService = app.get(ConfigService);

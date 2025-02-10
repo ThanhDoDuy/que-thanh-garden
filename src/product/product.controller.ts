@@ -1,4 +1,4 @@
-import { Controller, Post, UploadedFile, Body, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, UploadedFile, Body, UseInterceptors, Get, Patch, Delete, Param } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,17 +25,31 @@ export class ProductController {
   ) {
     await this.productService.upload(file);
     const fileName = file.originalname;
-    // Tạo Pre-signed URL lâu dài (7 ngày hoặc tùy bạn chọn)
-    const preSignedUrl = s3.getSignedUrl('getObject', {
-      Bucket: process.env.AWS_S3_BUCKET_NAME!,
-      Key: fileName,
-      Expires: 86400 * 7,  // 7 ngày
-    });
-
     return this.productService.createProduct({
       ...createProductDto,
-      image: fileName, 
-      imageURL: preSignedUrl,
+      image: fileName,
     });
+  }
+
+  @Get('all')
+  async getAllProducts() {
+    return this.productService.getAllProducts();
+  }
+
+  @Patch('generate-presigned-url')
+  async generatePresignedUrl(
+    @Body('productId') productId: string,
+  ) {
+    return await this.productService.updateImageUrl(productId);
+  };
+
+  @Patch(':id')
+  async updateProductName(@Param('id') id: string, @Body('name') name: string) {
+    return await this.productService.updateProductName(id, name);
+  }
+
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: string) {
+    return await this.productService.deleteProduct(id);
   }
 }
